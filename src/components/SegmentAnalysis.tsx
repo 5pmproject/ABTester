@@ -274,8 +274,8 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
                     <YAxis yAxisId="right" orientation="right" />
                     <Tooltip />
                     <Legend />
-                    <Bar yAxisId="left" dataKey="전환율" fill="#3B82F6" name={`${t.conversionRate} (%)`} />
-                    <Bar yAxisId="right" dataKey="평균주문금액" fill="#10B981" name={`${t.avgOrderValue} ($)`} />
+                    <Bar yAxisId="left" dataKey="전환율" fill="#3B82F6" name={`${t.generationConversionRate} (%)`} />
+                    <Bar yAxisId="right" dataKey="평균주문금액" fill="#10B981" name={`${t.generationAvgOrderValue} ($)`} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -327,7 +327,7 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <TrendingUp className="w-5 h-5 text-gray-600 mx-auto mb-1" />
-                    <p className="text-gray-600 text-xs mb-1">{t.conversionRate}</p>
+                    <p className="text-gray-600 text-xs mb-1">{t.generationConversionRate}</p>
                     <p className="text-gray-900">{gen.conversionRate}%</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
@@ -337,7 +337,7 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <Smartphone className="w-5 h-5 text-gray-600 mx-auto mb-1" />
-                    <p className="text-gray-600 text-xs mb-1">{t.mobile}</p>
+                    <p className="text-gray-600 text-xs mb-1">{t.deviceMobile}</p>
                     <p className="text-gray-900">{gen.mobileRate}%</p>
                   </div>
                 </div>
