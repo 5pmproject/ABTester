@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -62,19 +62,6 @@ const branchesData = [
     capacity: 30,
     status: 'Pending Setup'
   }
-];
-
-const servicesOptions = [
-  'Emergency Medicine',
-  'Cardiology',
-  'Pediatrics',
-  'Surgery',
-  'Radiology',
-  'Laboratory',
-  'ICU',
-  'Neurology',
-  'Orthopedics',
-  'Psychiatry'
 ];
 
 export function HospitalBranchesModule() {
@@ -195,7 +182,7 @@ export function HospitalBranchesModule() {
               </div>
               <div>
                 <Label htmlFor="admin">Admin Assigned</Label>
-                <Select value={newBranch.adminAssigned} onValueChange={(value) => setNewBranch({ ...newBranch, adminAssigned: value })}>
+                <Select value={newBranch.adminAssigned} onValueChange={(value: string) => setNewBranch({ ...newBranch, adminAssigned: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select admin" />
                   </SelectTrigger>

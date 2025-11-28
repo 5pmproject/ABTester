@@ -58,7 +58,6 @@ export function toSnakeCaseKeys<T extends Record<string, any>>(
   obj: T,
   keys: string[]
 ): any {
-  const snakeCased = toSnakeCase(obj);
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => {
       if (keys.includes(key)) {

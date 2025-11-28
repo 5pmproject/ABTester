@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -190,7 +190,7 @@ export function CoursesModule() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="mode">Training Mode</Label>
-                  <Select value={newCourse.mode} onValueChange={(value) => setNewCourse({ ...newCourse, mode: value })}>
+                  <Select value={newCourse.mode} onValueChange={(value: string) => setNewCourse({ ...newCourse, mode: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select mode" />
                     </SelectTrigger>
@@ -224,7 +224,7 @@ export function CoursesModule() {
               </div>
               <div>
                 <Label htmlFor="trainer">Assign Trainer</Label>
-                <Select value={newCourse.assignedTrainer} onValueChange={(value) => setNewCourse({ ...newCourse, assignedTrainer: value })}>
+                <Select value={newCourse.assignedTrainer} onValueChange={(value: string) => setNewCourse({ ...newCourse, assignedTrainer: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select trainer" />
                   </SelectTrigger>

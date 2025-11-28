@@ -236,11 +236,11 @@ export default function BehavioralEconomics({ testIdeas, language, onNavigateToI
               <div className="bg-white rounded-lg p-4 border-2 border-red-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-red-700">{delayDays} {t.totalLossForDays}</p>
-                  <p className="text-red-900 text-2xl">${opportunityCost.totalLoss.toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">${(opportunityCost?.totalLoss ?? 0).toFixed(0)}</p>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-red-200">
                   <p className="text-red-700">{t.kahnemanLossAversion}</p>
-                  <p className="text-red-900 text-2xl">${opportunityCost.psychologicalTotalLoss.toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">${(opportunityCost?.psychologicalTotalLoss ?? 0).toFixed(0)}</p>
                 </div>
               </div>
 

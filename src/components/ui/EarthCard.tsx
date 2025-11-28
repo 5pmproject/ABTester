@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+﻿import { ReactNode } from 'react';
 
 interface EarthCardProps {
   children: ReactNode;
@@ -23,3 +23,4 @@ export default function EarthCard({
     </div>
   );
 }
+

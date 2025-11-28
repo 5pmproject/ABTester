@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -6,7 +6,7 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Calendar, Clock, MapPin, Users, BookOpen, Plus, Edit, Trash2, Filter, ChevronLeft, ChevronRight, User } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Plus, Edit, Trash2, Filter, ChevronLeft, ChevronRight, User } from 'lucide-react';
 
 const calendarData = [
   {
@@ -132,7 +132,6 @@ const courses = [
 ];
 
 export function ScheduleModule() {
-  const [selectedDate, setSelectedDate] = useState('2024-01-28');
   const [viewMode, setViewMode] = useState('week');
   const [filterBranch, setFilterBranch] = useState('all');
   const [filterTrainer, setFilterTrainer] = useState('all');
@@ -230,7 +229,7 @@ export function ScheduleModule() {
                 </div>
                 <div>
                   <Label htmlFor="course">Course</Label>
-                  <Select value={newSession.course} onValueChange={(value) => setNewSession({ ...newSession, course: value })}>
+                  <Select value={newSession.course} onValueChange={(value: string) => setNewSession({ ...newSession, course: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select course" />
                     </SelectTrigger>
@@ -245,7 +244,7 @@ export function ScheduleModule() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="trainer">Trainer</Label>
-                  <Select value={newSession.trainer} onValueChange={(value) => setNewSession({ ...newSession, trainer: value })}>
+                  <Select value={newSession.trainer} onValueChange={(value: string) => setNewSession({ ...newSession, trainer: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select trainer" />
                     </SelectTrigger>
@@ -258,7 +257,7 @@ export function ScheduleModule() {
                 </div>
                 <div>
                   <Label htmlFor="branch">Branch</Label>
-                  <Select value={newSession.branch} onValueChange={(value) => setNewSession({ ...newSession, branch: value })}>
+                  <Select value={newSession.branch} onValueChange={(value: string) => setNewSession({ ...newSession, branch: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select branch" />
                     </SelectTrigger>
@@ -302,7 +301,7 @@ export function ScheduleModule() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="type">Session Type</Label>
-                  <Select value={newSession.type} onValueChange={(value) => setNewSession({ ...newSession, type: value })}>
+                  <Select value={newSession.type} onValueChange={(value: string) => setNewSession({ ...newSession, type: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>

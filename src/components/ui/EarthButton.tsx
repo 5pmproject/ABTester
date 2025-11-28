@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+﻿import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'error' | 'outline';
 
@@ -32,3 +32,4 @@ export default function EarthButton({
     </button>
   );
 }
+

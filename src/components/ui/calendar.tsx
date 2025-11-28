@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react@0.487.0";
-import { DayPicker } from "react-day-picker@8.10.1";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
 import { cn } from "./utils";
 import { buttonVariants } from "./button";
@@ -60,10 +60,11 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
+        // @ts-expect-error IconLeft is supported at runtime but missing in the type defs
+        IconLeft: ({ className, ...props }: { className?: string }) => (
           <ChevronLeft className={cn("size-4", className)} {...props} />
         ),
-        IconRight: ({ className, ...props }) => (
+        IconRight: ({ className, ...props }: { className?: string }) => (
           <ChevronRight className={cn("size-4", className)} {...props} />
         ),
       }}
@@ -73,3 +74,4 @@ function Calendar({
 }
 
 export { Calendar };
+

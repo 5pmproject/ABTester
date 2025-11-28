@@ -15,7 +15,7 @@ export default function TestIdeas({ testIdeas, onUpdate, onDelete, language }: T
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'planned' | 'running' | 'completed'>('all');
   const [sortBy, setSortBy] = useState<'iceScore' | 'createdAt' | 'expectedImprovement'>('iceScore');
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [, setEditingId] = useState<string | null>(null);
 
   const filteredIdeas = testIdeas
     .filter(idea => {

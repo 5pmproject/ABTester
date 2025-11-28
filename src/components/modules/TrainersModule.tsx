@@ -1,14 +1,13 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Badge } from '../ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { Users, Star, BookOpen, MapPin, Phone, Mail, Plus, Edit, Eye, Calendar, Award, FileText } from 'lucide-react';
+import { Users, Star, BookOpen, MapPin, Plus, Edit, Eye, Calendar, Award, FileText } from 'lucide-react';
 
 const trainersData = [
   {
@@ -207,7 +206,7 @@ export function TrainersModule() {
                 </div>
                 <div>
                   <Label htmlFor="specialty">Specialty</Label>
-                  <Select value={newTrainer.specialty} onValueChange={(value) => setNewTrainer({ ...newTrainer, specialty: value })}>
+                  <Select value={newTrainer.specialty} onValueChange={(value: string) => setNewTrainer({ ...newTrainer, specialty: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select specialty" />
                     </SelectTrigger>
@@ -261,7 +260,7 @@ export function TrainersModule() {
                 </div>
                 <div>
                   <Label htmlFor="branch">Assign Branch</Label>
-                  <Select value={newTrainer.branchAssigned} onValueChange={(value) => setNewTrainer({ ...newTrainer, branchAssigned: value })}>
+                  <Select value={newTrainer.branchAssigned} onValueChange={(value: string) => setNewTrainer({ ...newTrainer, branchAssigned: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select branch" />
                     </SelectTrigger>

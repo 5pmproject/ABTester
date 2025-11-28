@@ -1,4 +1,4 @@
-interface LogoProps {
+﻿interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -78,3 +78,4 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Lock, Globe } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import Logo from '../ui/Logo';
 import { Language, translations } from '../../types/translations';
 

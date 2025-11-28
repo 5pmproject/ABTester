@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -200,7 +200,7 @@ export function UserPermissionsModule() {
                     </div>
                     <div>
                       <Label htmlFor="role">Assign Role</Label>
-                      <Select value={newUser.role} onValueChange={(value) => setNewUser({ ...newUser, role: value })}>
+                      <Select value={newUser.role} onValueChange={(value: string) => setNewUser({ ...newUser, role: value })}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
