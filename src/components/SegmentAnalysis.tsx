@@ -11,6 +11,10 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
   const t = translations[language];
   const [selectedSegment, setSelectedSegment] = useState<'all' | 'gen-z' | 'millennial' | 'gen-x' | 'boomer'>('all');
 
+  // ⚠️ 경고: 아래 데이터는 데모 목적의 예시 값입니다
+  // 실제 값은 산업군, 지역, 제품 유형에 따라 크게 다를 수 있습니다
+  // 출처: 일반적인 e-commerce 통계 범위 (Statista, eMarketer 2023-2024)
+  // 프로덕션에서는 자사 데이터로 교체 필수!
   const generationData = [
     {
       id: 'gen-z',
@@ -18,12 +22,12 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
       ageRange: t.genZAge,
       description: t.genZDesc,
       color: '#8B5CF6',
-      conversionRate: 2.8,
-      avgOrderValue: 45,
-      mobileRate: 85,
-      socialProofSensitivity: 9,
-      scarcitySensitivity: 7,
-      authoritySensitivity: 5,
+      conversionRate: 2.8, // 업계 평균: 1.5-3.5%
+      avgOrderValue: 45, // 일반적 범위: $35-60
+      mobileRate: 85, // Pew Research 2024: 75-85%
+      socialProofSensitivity: 9, // 가정 값 - A/B 테스트로 검증 필요
+      scarcitySensitivity: 7, // 가정 값 - A/B 테스트로 검증 필요
+      authoritySensitivity: 5, // 가정 값 - A/B 테스트로 검증 필요
       behaviors: [
         '모바일 우선 경험 선호',
         '인플루언서 추천에 높은 반응',
@@ -159,6 +163,60 @@ export default function SegmentAnalysis({ language }: SegmentAnalysisProps) {
             <p className="text-gray-600">
               {t.generationAnalysisSubtitle}
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Source Warning */}
+      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="text-yellow-900 font-medium mb-1">
+              {language === 'ko' ? '⚠️ 데모 데이터 안내' : '⚠️ Demo Data Notice'}
+            </h4>
+            <p className="text-yellow-800 text-sm mb-2">
+              {language === 'ko' 
+                ? '이 페이지의 데이터는 교육 및 데모 목적의 예시 값입니다. 실제 운영 시에는 자사 데이터를 사용하시거나 아래 신뢰할 수 있는 출처의 최신 통계로 교체해야 합니다.' 
+                : 'The data on this page is for educational and demo purposes only. For production use, please replace with your own data or verified statistics from trusted sources below.'}
+            </p>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <a 
+                href="https://www.statista.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-yellow-700 hover:text-yellow-900 underline"
+              >
+                Statista
+              </a>
+              <span className="text-yellow-600">•</span>
+              <a 
+                href="https://www.emarketer.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-yellow-700 hover:text-yellow-900 underline"
+              >
+                eMarketer
+              </a>
+              <span className="text-yellow-600">•</span>
+              <a 
+                href="https://www.pewresearch.org" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-yellow-700 hover:text-yellow-900 underline"
+              >
+                Pew Research
+              </a>
+              <span className="text-yellow-600">•</span>
+              <a 
+                href="https://baymard.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-yellow-700 hover:text-yellow-900 underline"
+              >
+                Baymard Institute
+              </a>
+            </div>
           </div>
         </div>
       </div>

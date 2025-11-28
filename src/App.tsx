@@ -9,6 +9,8 @@ import SegmentAnalysis from './components/SegmentAnalysis';
 import AuthPage from './components/AuthPage';
 import Logo from './components/ui/Logo';
 import { Language, translations } from './types/translations';
+import { useTestIdeas } from './hooks/useTestIdeas';
+import { useAuth } from './hooks/useAuth';
 
 type AuthView = 'login' | 'signup' | 'app' | 'guest';
 
@@ -108,41 +110,49 @@ const getMockTestIdeas = (lang: Language): TestIdea[] => [
 
 export default function App() {
   const [authView, setAuthView] = useState<AuthView>('app');
-  const [user, setUser] = useState<User>(null);
   const [language, setLanguage] = useState<Language>('ko');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [testIdeas, setTestIdeas] = useState<TestIdea[]>(getMockTestIdeas('ko'));
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Supabase Hooks
+  const { 
+    user, 
+    loading: authLoading,
+    error: authError,
+    signIn: authSignIn, 
+    signUp: authSignUp, 
+    signOut: authSignOut,
+    isOnline: authOnline 
+  } = useAuth({ language });
+
+  const {
+    testIdeas,
+    loading: ideasLoading,
+    error: ideasError,
+    addTestIdea: addIdea,
+    updateTestIdea: updateIdea,
+    deleteTestIdea: deleteIdea,
+    isOnline: ideasOnline
+  } = useTestIdeas({ language, autoLoad: true });
 
   const t = translations[language];
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
-    // Update test ideas names based on language, but keep user-added ideas unchanged
-    setTestIdeas(prevIdeas => {
-      return prevIdeas.map(idea => {
-        const mockIdeas = getMockTestIdeas(newLanguage);
-        const mockIdea = mockIdeas.find(m => m.id === idea.id);
-        if (mockIdea) {
-          return { ...idea, name: mockIdea.name };
-        }
-        return idea;
-      });
-    });
-    setHasUnsavedChanges(true);
   };
 
   const handleResetData = () => {
     if (window.confirm(language === 'ko' 
-      ? '모든 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.' 
-      : 'Are you sure you want to reset all data? This action cannot be undone.')) {
-      setTestIdeas(getMockTestIdeas(language));
-      setHasUnsavedChanges(false);
-      // Clear localStorage if used
+      ? '모든 로컬 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.' 
+      : 'Are you sure you want to reset all local data? This action cannot be undone.')) {
+      // Clear localStorage
       localStorage.removeItem('testIdeas');
-      localStorage.removeItem('user');
+      localStorage.removeItem('guestUser');
+      setHasUnsavedChanges(false);
+      // Reload page to refresh from Supabase
+      window.location.reload();
     }
   };
 
@@ -155,38 +165,30 @@ export default function App() {
     { id: 'segment', label: t.segmentAnalysis, icon: Users }
   ];
 
-  const addTestIdea = (idea: Omit<TestIdea, 'id' | 'iceScore' | 'createdAt' | 'status'>) => {
-    const iceScore = idea.impact * idea.confidence * idea.ease;
-    const newIdea: TestIdea = {
-      ...idea,
-      id: Date.now().toString(),
-      iceScore,
-      createdAt: new Date().toISOString().split('T')[0],
-      status: 'planned'
-    };
-    setTestIdeas([...testIdeas, newIdea]);
-    setHasUnsavedChanges(true);
+  // Test Ideas 관리 함수들은 useTestIdeas Hook에서 제공
+  const handleAddTestIdea = async (idea: Omit<TestIdea, 'id' | 'iceScore' | 'createdAt' | 'status'>) => {
+    try {
+      await addIdea(idea);
+    } catch (error) {
+      console.error('Failed to add test idea:', error);
+    }
   };
 
-  const updateTestIdea = (id: string, updates: Partial<TestIdea>) => {
-    setTestIdeas(testIdeas.map(idea => {
-      if (idea.id === id) {
-        const updated = { ...idea, ...updates };
-        if (updates.impact || updates.confidence || updates.ease) {
-          updated.iceScore = (updates.impact || idea.impact) * 
-                            (updates.confidence || idea.confidence) * 
-                            (updates.ease || idea.ease);
-        }
-        return updated;
-      }
-      return idea;
-    }));
-    setHasUnsavedChanges(true);
+  const handleUpdateTestIdea = async (id: string, updates: Partial<TestIdea>) => {
+    try {
+      await updateIdea(id, updates);
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error('Failed to update test idea:', error);
+    }
   };
 
-  const deleteTestIdea = (id: string) => {
-    setTestIdeas(testIdeas.filter(idea => idea.id !== id));
-    setHasUnsavedChanges(true);
+  const handleDeleteTestIdea = async (id: string) => {
+    try {
+      await deleteIdea(id);
+    } catch (error) {
+      console.error('Failed to delete test idea:', error);
+    }
   };
 
   const renderContent = () => {
@@ -194,18 +196,18 @@ export default function App() {
       case 'dashboard':
         return <Dashboard testIdeas={testIdeas} language={language} />;
       case 'ice':
-        return <ICECalculator onAddTestIdea={addTestIdea} language={language} />;
+        return <ICECalculator onAddTestIdea={handleAddTestIdea} language={language} />;
       case 'ideas':
         return (
           <TestIdeas 
             testIdeas={testIdeas}
-            onUpdate={updateTestIdea}
-            onDelete={deleteTestIdea}
+            onUpdate={handleUpdateTestIdea}
+            onDelete={handleDeleteTestIdea}
             language={language}
           />
         );
       case 'behavioral':
-        return <BehavioralEconomics testIdeas={testIdeas} language={language} />;
+        return <BehavioralEconomics testIdeas={testIdeas} language={language} onNavigateToICE={() => setActiveTab('ice')} />;
       case 'statistical':
         return <StatisticalTools language={language} />;
       case 'segment':
@@ -215,29 +217,37 @@ export default function App() {
     }
   };
 
-  const handleLogin = (email: string, password: string) => {
-    // Mock login - in production, validate against backend
-    const userData: User = {
-      name: email.split('@')[0],
-      email: email,
-      company: 'Demo Company'
-    };
-    setUser(userData);
-    setShowAuthModal(false);
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      await authSignIn(email, password);
+      setShowAuthModal(false);
+      setAuthView('app');
+    } catch (error: any) {
+      alert(language === 'ko' 
+        ? `로그인 실패: ${error.message || '다시 시도해주세요'}` 
+        : `Login failed: ${error.message || 'Please try again'}`
+      );
+    }
   };
 
-  const handleSignup = (name: string, email: string, password: string, company: string) => {
-    // Mock signup - in production, send to backend
-    const userData: User = {
-      name,
-      email,
-      company
-    };
-    setUser(userData);
-    setShowAuthModal(false);
+  const handleSignup = async (name: string, email: string, password: string, company: string) => {
+    try {
+      await authSignUp(email, password, name, company);
+      setShowAuthModal(false);
+      setAuthView('app');
+      alert(language === 'ko' 
+        ? '회원가입이 완료되었습니다!' 
+        : 'Signup successful!'
+      );
+    } catch (error: any) {
+      alert(language === 'ko' 
+        ? `회원가입 실패: ${error.message || '다시 시도해주세요'}` 
+        : `Signup failed: ${error.message || 'Please try again'}`
+      );
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (hasUnsavedChanges) {
       const confirmed = window.confirm(
         language === 'ko' 
@@ -246,20 +256,30 @@ export default function App() {
       );
       if (!confirmed) return;
     }
-    setUser(null);
-    setAuthView('login');
-    setHasUnsavedChanges(false);
+    
+    try {
+      await authSignOut();
+      setAuthView('login');
+      setHasUnsavedChanges(false);
+    } catch (error: any) {
+      alert(language === 'ko' 
+        ? '로그아웃 실패' 
+        : 'Logout failed'
+      );
+    }
   };
 
   const handleSave = () => {
+    // Supabase는 자동으로 저장됨
     if (!user) {
       alert(language === 'ko' ? '저장하려면 로그인이 필요합니다.' : 'Login required to save.');
       return;
     }
-    // Mock save - in production, send to backend
-    console.log('Saving data...', testIdeas);
     setHasUnsavedChanges(false);
-    alert(language === 'ko' ? '저장되었습니다!' : 'Saved successfully!');
+    alert(language === 'ko' 
+      ? 'Supabase에 자동으로 저장되었습니다!' 
+      : 'Automatically saved to Supabase!'
+    );
   };
 
   const handleGuestContinue = () => {
@@ -325,8 +345,8 @@ export default function App() {
           {user && (
             <div className="mt-8 pt-4 border-t border-[#e8e1d9]">
               <div className="px-4 py-3 bg-white/50 rounded-xl mb-2">
-                <p className="text-[#4a4237] text-sm truncate">{user.name}</p>
-                <p className="text-[#8b7d6b] text-xs truncate">{user.company}</p>
+                <p className="text-[#4a4237] text-sm truncate">{user.profile.name}</p>
+                <p className="text-[#8b7d6b] text-xs truncate">{user.profile.company || 'No Company'}</p>
               </div>
               <button
                 onClick={handleLogout}
@@ -433,11 +453,11 @@ export default function App() {
                 {user ? (
                   <>
                     <div className="text-right">
-                      <p className="text-[#4a4237] text-sm">{user.name}</p>
-                      <p className="text-[#8b7d6b] text-xs">{user.company}</p>
+                      <p className="text-[#4a4237] text-sm">{user.profile.name}</p>
+                      <p className="text-[#8b7d6b] text-xs">{user.profile.company || 'No Company'}</p>
                     </div>
                     <div className="w-10 h-10 gradient-primary rounded-full flex items-center justify-center text-white shadow-earth">
-                      {user.name.charAt(0).toUpperCase()}
+                      {user.profile.name.charAt(0).toUpperCase()}
                     </div>
                   </>
                 ) : (

@@ -6,9 +6,10 @@ import { Language, translations } from '../types/translations';
 type BehavioralEconomicsProps = {
   testIdeas: TestIdea[];
   language: Language;
+  onNavigateToICE?: () => void;
 };
 
-export default function BehavioralEconomics({ testIdeas, language }: BehavioralEconomicsProps) {
+export default function BehavioralEconomics({ testIdeas, language, onNavigateToICE }: BehavioralEconomicsProps) {
   const t = translations[language];
   const [selectedTestId, setSelectedTestId] = useState<string>(testIdeas[0]?.id || '');
   const [avgOrderValue, setAvgOrderValue] = useState(50);
@@ -99,6 +100,47 @@ export default function BehavioralEconomics({ testIdeas, language }: BehavioralE
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
   };
+
+  // 테스트 아이디어가 없을 때 안내 메시지
+  if (testIdeas.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#e8e1d9' }}>
+              <Brain className="w-6 h-6" style={{ color: '#a89075' }} />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-gray-900 mb-2">{t.behavioralTitle}</h2>
+              <p className="text-gray-600">
+                {t.behavioralSubtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Empty State */}
+        <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
+          <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-gray-900 mb-2">
+            {language === 'ko' ? '테스트 아이디어가 없습니다' : 'No Test Ideas'}
+          </h3>
+          <p className="text-gray-600 mb-4">
+            {language === 'ko' 
+              ? 'ICE Calculator에서 테스트 아이디어를 먼저 추가해주세요.' 
+              : 'Please add test ideas from ICE Calculator first.'}
+          </p>
+          <button
+            onClick={() => onNavigateToICE && onNavigateToICE()}
+            className="inline-block px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-lg hover:from-teal-600 hover:to-blue-700 transition-colors cursor-pointer"
+          >
+            {language === 'ko' ? 'ICE Calculator로 이동' : 'Go to ICE Calculator'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
