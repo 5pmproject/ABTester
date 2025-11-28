@@ -1,5 +1,5 @@
 
-  # Hospital Data Management Dashboard
+ Dashboard
 
   This is a code bundle for Hospital Data Management Dashboard. The original project is available at https://www.figma.com/design/1Ms9EsvzCOzRAJgoeAYmjQ/Hospital-Data-Management-Dashboard.
 
