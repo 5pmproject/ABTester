@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, LayoutDashboard, Calculator, Lightbulb, Brain, BarChart3, Users, Globe, LogOut, Save, RefreshCw } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Calculator, Lightbulb, Brain, BarChart3, Users, LogOut, Save, RefreshCw } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import ICECalculator from './components/ICECalculator';
 import TestIdeas from './components/TestIdeas';
@@ -30,83 +30,6 @@ export type TestIdea = {
   actualResult?: number;
 };
 
-type User = {
-  name: string;
-  email: string;
-  company: string;
-} | null;
-
-// Mock test ideas generator function
-const getMockTestIdeas = (lang: Language): TestIdea[] => [
-  {
-    id: '1',
-    name: lang === 'ko' ? '결제 페이지 CTA 버튼 색상 변경' : 'Change checkout CTA button color',
-    impact: 8,
-    confidence: 7,
-    ease: 9,
-    iceScore: 504,
-    currentConversionRate: 3.2,
-    expectedImprovement: 15,
-    monthlyTraffic: 50000,
-    status: 'completed',
-    createdAt: '2025-11-01',
-    testDuration: 14,
-    actualResult: 12.5
-  },
-  {
-    id: '2',
-    name: lang === 'ko' ? '상품 페이지에 사회적 증거 배지 추가' : 'Add social proof badges to product page',
-    impact: 9,
-    confidence: 8,
-    ease: 7,
-    iceScore: 504,
-    currentConversionRate: 2.8,
-    expectedImprovement: 20,
-    monthlyTraffic: 50000,
-    status: 'running',
-    createdAt: '2025-11-15',
-    testDuration: 7
-  },
-  {
-    id: '3',
-    name: lang === 'ko' ? '무료 배송 임계값 강조' : 'Emphasize free shipping threshold',
-    impact: 7,
-    confidence: 8,
-    ease: 8,
-    iceScore: 448,
-    currentConversionRate: 3.2,
-    expectedImprovement: 12,
-    monthlyTraffic: 50000,
-    status: 'planned',
-    createdAt: '2025-11-20'
-  },
-  {
-    id: '4',
-    name: lang === 'ko' ? '긴급성 타이머 추가 (한정 수량)' : 'Add urgency timer (limited stock)',
-    impact: 8,
-    confidence: 6,
-    ease: 7,
-    iceScore: 336,
-    currentConversionRate: 3.2,
-    expectedImprovement: 18,
-    monthlyTraffic: 50000,
-    status: 'planned',
-    createdAt: '2025-11-22'
-  },
-  {
-    id: '5',
-    name: lang === 'ko' ? '장바구니 포기 시 할인 쿠폰 제공' : 'Offer discount on cart abandonment',
-    impact: 9,
-    confidence: 7,
-    ease: 5,
-    iceScore: 315,
-    currentConversionRate: 3.2,
-    expectedImprovement: 25,
-    monthlyTraffic: 50000,
-    status: 'planned',
-    createdAt: '2025-11-23'
-  }
-];
 
 export default function App() {
   const [authView, setAuthView] = useState<AuthView>('app');
@@ -119,18 +42,13 @@ export default function App() {
   // Supabase Hooks
   const { 
     user, 
-    loading: authLoading,
-    error: authError,
     signIn: authSignIn, 
     signUp: authSignUp, 
-    signOut: authSignOut,
-    isOnline: authOnline 
+    signOut: authSignOut
   } = useAuth({ language });
 
   const {
     testIdeas,
-    loading: ideasLoading,
-    error: ideasError,
     addTestIdea: addIdea,
     updateTestIdea: updateIdea,
     deleteTestIdea: deleteIdea,
@@ -400,6 +318,16 @@ export default function App() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Online/Offline Status Indicator */}
+              {!ideasOnline && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-blue-700 text-xs font-medium">
+                    {language === 'ko' ? 'localStorage 모드' : 'localStorage Mode'}
+                  </span>
+                </div>
+              )}
+
               {/* Reset Button */}
               <button
                 onClick={handleResetData}

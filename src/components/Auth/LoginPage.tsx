@@ -155,11 +155,16 @@ export default function LoginPage({
         </div>
 
         {/* Info Note */}
-        <div className="mt-6 p-4 bg-[#f5f1ed] rounded-xl border border-[#e8e1d9]">
-          <p className="text-[#6b5d52] text-sm text-center">
+        <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <p className="text-blue-800 text-sm text-center font-medium">
             {language === 'ko' 
-              ? '💡 로그인하지 않아도 모든 기능을 사용할 수 있습니다. 단, 데이터 저장을 위해서는 로그인이 필요합니다.'
-              : '💡 You can use all features without login. However, login is required to save your data.'}
+              ? '💡 게스트 모드: 브라우저에 데이터가 저장됩니다 (localStorage)'
+              : '💡 Guest Mode: Data is saved in your browser (localStorage)'}
+          </p>
+          <p className="text-blue-600 text-xs text-center mt-1">
+            {language === 'ko' 
+              ? '로그인하면 클라우드에 안전하게 저장되고 여러 기기에서 접근 가능합니다'
+              : 'Login to save securely in the cloud and access from multiple devices'}
           </p>
         </div>
       </div>
