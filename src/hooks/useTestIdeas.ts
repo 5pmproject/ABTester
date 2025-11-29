@@ -113,8 +113,11 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
     };
 
     // Optimistic Update
-    setTestIdeas(prev => [...prev, newIdea]);
-    saveToLocalStorage([...testIdeas, newIdea]);
+    setTestIdeas(prev => {
+      const updated = [...prev, newIdea];
+      saveToLocalStorage(updated);
+      return updated;
+    });
 
     if (!isSupabaseConfigured()) {
       return; // localStorage만 사용
@@ -123,16 +126,23 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
     try {
       const savedIdea = await testIdeasService.create(newIdea);
       // 임시 ID를 실제 ID로 교체
-      setTestIdeas(prev => prev.map(t => t.id === newIdea.id ? savedIdea : t));
-      saveToLocalStorage(testIdeas.map(t => t.id === newIdea.id ? savedIdea : t));
+      setTestIdeas(prev => {
+        const updated = prev.map(t => t.id === newIdea.id ? savedIdea : t);
+        saveToLocalStorage(updated);
+        return updated;
+      });
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
       logError('useTestIdeas.addTestIdea', err);
       // Rollback on error
-      setTestIdeas(prev => prev.filter(t => t.id !== newIdea.id));
+      setTestIdeas(prev => {
+        const updated = prev.filter(t => t.id !== newIdea.id);
+        saveToLocalStorage(updated);
+        return updated;
+      });
     }
-  }, [testIdeas, language, saveToLocalStorage]);
+  }, [language, saveToLocalStorage]);
 
   /**
    * 테스트 아이디어 업데이트
