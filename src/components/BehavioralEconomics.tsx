@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TestIdea } from '../App';
 import { Brain, TrendingDown, Users, Shield, Repeat, Gift, CheckCircle, DollarSign } from 'lucide-react';
 import { Language, translations } from '../types/translations';
@@ -11,9 +11,16 @@ type BehavioralEconomicsProps = {
 
 export default function BehavioralEconomics({ testIdeas, language, onNavigateToICE }: BehavioralEconomicsProps) {
   const t = translations[language];
-  const [selectedTestId, setSelectedTestId] = useState<string>(testIdeas[0]?.id || '');
+  const [selectedTestId, setSelectedTestId] = useState<string>('');
   const [avgOrderValue, setAvgOrderValue] = useState(50);
   const [delayDays, setDelayDays] = useState(7);
+
+  // testIdeas가 업데이트되면 첫 번째 아이디어를 자동 선택
+  useEffect(() => {
+    if (!selectedTestId && testIdeas.length > 0) {
+      setSelectedTestId(testIdeas[0].id);
+    }
+  }, [testIdeas, selectedTestId]);
 
   const selectedTest = testIdeas.find(test => test.id === selectedTestId);
 
