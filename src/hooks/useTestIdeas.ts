@@ -202,7 +202,6 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
    */
   const updateTestIdea = useCallback(async (id: string, updates: Partial<TestIdea>) => {
     // Optimistic Update
-    const previousIdeas = [...testIdeas];
     const updatedIdeas = testIdeas.map(idea => {
       if (idea.id === id) {
         const updated = { ...idea, ...updates };
@@ -265,7 +264,6 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
    */
   const deleteTestIdea = useCallback(async (id: string) => {
     // Optimistic Update
-    const previousIdeas = [...testIdeas];
     const deletedIdea = testIdeas.find(idea => idea.id === id);
     const updatedIdeas = testIdeas.filter(idea => idea.id !== id);
     
