@@ -74,11 +74,19 @@ export class TestIdeasService {
       throw new Error('User must be authenticated to create test ideas');
     }
 
-    // DB가 자동으로 처리하는 필드들 제거
-    const { iceScore, status, ...ideaWithoutComputedFields } = idea;
+    // DB가 자동으로 처리하거나 프론트엔드 전용 필드들 제거
+    const {
+      iceScore,     // trigger로 자동 계산
+      status,       // DB default 'planned'
+      id,           // 임시 ID 제거 (DB에서 UUID 생성)
+      createdAt,    // DB에서 자동 생성
+      userId,       // user.id로 직접 설정
+      synced,       // 프론트엔드 전용 필드
+      ...rest
+    } = idea as any;
 
     // camelCase → snake_case 변환
-    const snakeCaseData = toSnakeCase(ideaWithoutComputedFields);
+    const snakeCaseData = toSnakeCase(rest);
 
     const { data, error } = await supabase
       .from('test_ideas')
