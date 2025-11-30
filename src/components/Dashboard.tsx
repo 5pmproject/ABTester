@@ -10,8 +10,15 @@ type DashboardProps = {
 
 export default function Dashboard({ testIdeas, language }: DashboardProps) {
   const t = translations[language];
+  
+  // 🔍 디버깅: Dashboard가 받은 testIdeas 확인
+  console.log('🎯 Dashboard - testIdeas 개수:', testIdeas.length);
+  console.log('🎯 Dashboard - testIdeas 데이터:', testIdeas);
+  
   const sortedIdeas = [...testIdeas].sort((a, b) => b.iceScore - a.iceScore);
   const topIdeas = sortedIdeas.slice(0, 5);
+  
+  console.log('🎯 Dashboard - Top 5 아이디어:', topIdeas.map(t => ({ name: t.name, iceScore: t.iceScore })));
 
   const completedTests = testIdeas.filter(test => test.status === 'completed');
   const runningTests = testIdeas.filter(test => test.status === 'running');

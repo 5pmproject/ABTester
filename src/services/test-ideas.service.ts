@@ -8,6 +8,9 @@ import { TestIdea } from '../App';
  */
 
 export class TestIdeasService {
+  // supabase 인스턴스를 외부에서 접근 가능하게 (인증 체크용)
+  public supabase = supabase;
+
   /**
    * 모든 테스트 아이디어 조회 (ICE 점수 순)
    */

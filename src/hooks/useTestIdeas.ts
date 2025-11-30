@@ -103,6 +103,8 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
   const addTestIdea = useCallback(async (
     idea: Omit<TestIdea, 'id' | 'iceScore' | 'createdAt' | 'status'>
   ) => {
+    console.log('🔵 addTestIdea 시작:', idea);
+    
     const iceScore = idea.impact * idea.confidence * idea.ease;
     const newIdea: TestIdea = {
       ...idea,
@@ -110,23 +112,42 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
       iceScore,
       createdAt: new Date().toISOString(),
       status: 'planned',
-      synced: !isSupabaseConfigured(), // Supabase 없으면 이미 synced로 간주
+      synced: true, // 기본값: true (localStorage 저장 완료)
     };
+
+    console.log('🔵 새 아이디어 생성:', newIdea);
 
     // Optimistic Update - 로컬에 즉시 저장
     setTestIdeas(prev => {
+      console.log('🔵 이전 testIdeas 개수:', prev.length);
       const updated = [...prev, newIdea];
+      console.log('🔵 업데이트된 testIdeas 개수:', updated.length);
       saveToLocalStorage(updated);
       return updated;
     });
 
+    // ✅ Supabase 미설정 시 localStorage만 사용
     if (!isSupabaseConfigured()) {
-      return; // localStorage만 사용 (이미 synced: true)
+      console.log('✅ localStorage 모드: 로컬에만 저장되었습니다');
+      return;
     }
 
+    // ✅ 로그인 여부 확인 (게스트 모드는 Supabase 호출 안 함)
+    try {
+      const { data: { user } } = await testIdeasService.supabase.auth.getUser();
+      if (!user) {
+        console.log('✅ 게스트 모드: 로컬에만 저장되었습니다');
+        return; // 게스트는 로컬만 사용
+      }
+    } catch (authErr) {
+      console.log('✅ 인증 확인 실패: 로컬에만 저장되었습니다');
+      return;
+    }
+
+    // ✅ 로그인된 상태에서만 Supabase 저장 시도
     try {
       const savedIdea = await testIdeasService.create(newIdea);
-      // 임시 ID를 실제 Supabase ID로 교체하고 synced: true 표시
+      // 임시 ID를 실제 Supabase ID로 교체
       setTestIdeas(prev => {
         const updated = prev.map(t => 
           t.id === newIdea.id 
@@ -136,14 +157,14 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
         saveToLocalStorage(updated);
         return updated;
       });
-      setError(null); // 성공 시 이전 에러 제거
+      setError(null);
+      console.log('✅ Supabase 저장 성공');
     } catch (err: any) {
+      // Supabase 저장 실패해도 로컬 데이터는 유지
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
       logError('useTestIdeas.addTestIdea', err);
       
-      // ✅ 중요: 롤백하지 않고, synced: false로 표시만 함
-      // 로컬에는 남아있고, 나중에 재시도 가능
       setTestIdeas(prev => {
         const updated = prev.map(t => 
           t.id === newIdea.id 
@@ -154,12 +175,7 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
         return updated;
       });
       
-      // 사용자에게 알림 (로컬에는 저장됨)
-      console.warn(
-        language === 'ko' 
-          ? '⚠️ 서버 저장 실패: 로컬에만 저장되었습니다. 나중에 자동으로 동기화됩니다.' 
-          : '⚠️ Server save failed: Saved locally only. Will sync automatically later.'
-      );
+      console.warn('⚠️ Supabase 저장 실패: 로컬에만 저장되었습니다');
     }
   }, [language, saveToLocalStorage]);
 

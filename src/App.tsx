@@ -56,6 +56,9 @@ export default function App() {
     isOnline: ideasOnline
   } = useTestIdeas({ language, autoLoad: true });
 
+  console.log('🟢 App.tsx - testIdeas 개수:', testIdeas.length);
+  console.log('🟢 App.tsx - testIdeas:', testIdeas);
+
   const t = translations[language];
 
   const handleLanguageChange = (newLanguage: Language) => {
