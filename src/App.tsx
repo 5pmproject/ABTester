@@ -28,6 +28,7 @@ export type TestIdea = {
   createdAt: string;
   testDuration?: number;
   actualResult?: number;
+  synced?: boolean; // Supabase와 동기화 여부 (로컬 전용 필드)
 };
 
 

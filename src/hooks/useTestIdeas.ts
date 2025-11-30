@@ -110,9 +110,10 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
       iceScore,
       createdAt: new Date().toISOString(),
       status: 'planned',
+      synced: !isSupabaseConfigured(), // Supabase 없으면 이미 synced로 간주
     };
 
-    // Optimistic Update
+    // Optimistic Update - 로컬에 즉시 저장
     setTestIdeas(prev => {
       const updated = [...prev, newIdea];
       saveToLocalStorage(updated);
@@ -120,27 +121,45 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
     });
 
     if (!isSupabaseConfigured()) {
-      return; // localStorage만 사용
+      return; // localStorage만 사용 (이미 synced: true)
     }
 
     try {
       const savedIdea = await testIdeasService.create(newIdea);
-      // 임시 ID를 실제 ID로 교체
+      // 임시 ID를 실제 Supabase ID로 교체하고 synced: true 표시
       setTestIdeas(prev => {
-        const updated = prev.map(t => t.id === newIdea.id ? savedIdea : t);
+        const updated = prev.map(t => 
+          t.id === newIdea.id 
+            ? { ...savedIdea, synced: true } 
+            : t
+        );
         saveToLocalStorage(updated);
         return updated;
       });
+      setError(null); // 성공 시 이전 에러 제거
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
       logError('useTestIdeas.addTestIdea', err);
-      // Rollback on error
+      
+      // ✅ 중요: 롤백하지 않고, synced: false로 표시만 함
+      // 로컬에는 남아있고, 나중에 재시도 가능
       setTestIdeas(prev => {
-        const updated = prev.filter(t => t.id !== newIdea.id);
+        const updated = prev.map(t => 
+          t.id === newIdea.id 
+            ? { ...t, synced: false } 
+            : t
+        );
         saveToLocalStorage(updated);
         return updated;
       });
+      
+      // 사용자에게 알림 (로컬에는 저장됨)
+      console.warn(
+        language === 'ko' 
+          ? '⚠️ 서버 저장 실패: 로컬에만 저장되었습니다. 나중에 자동으로 동기화됩니다.' 
+          : '⚠️ Server save failed: Saved locally only. Will sync automatically later.'
+      );
     }
   }, [language, saveToLocalStorage]);
 
@@ -174,13 +193,20 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
 
     try {
       await testIdeasService.update(id, updates);
+      // 성공 시 synced: true 표시
+      setTestIdeas(prev => 
+        prev.map(t => t.id === id ? { ...t, synced: true } : t)
+      );
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
       logError('useTestIdeas.updateTestIdea', err);
-      // Rollback on error
-      setTestIdeas(previousIdeas);
-      saveToLocalStorage(previousIdeas);
+      // ✅ 업데이트는 로컬에 유지, synced만 false로 표시
+      setTestIdeas(prev => {
+        const updated = prev.map(t => t.id === id ? { ...t, synced: false } : t);
+        saveToLocalStorage(updated);
+        return updated;
+      });
     }
   }, [testIdeas, language, saveToLocalStorage]);
 
@@ -190,6 +216,7 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
   const deleteTestIdea = useCallback(async (id: string) => {
     // Optimistic Update
     const previousIdeas = [...testIdeas];
+    const deletedIdea = testIdeas.find(idea => idea.id === id);
     const updatedIdeas = testIdeas.filter(idea => idea.id !== id);
     
     setTestIdeas(updatedIdeas);
@@ -205,9 +232,19 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
       logError('useTestIdeas.deleteTestIdea', err);
-      // Rollback on error
-      setTestIdeas(previousIdeas);
-      saveToLocalStorage(previousIdeas);
+      // ✅ 삭제는 실패 시 복원 (삭제는 민감한 작업이므로)
+      if (deletedIdea) {
+        setTestIdeas(prev => {
+          const restored = [...prev, { ...deletedIdea, synced: false }];
+          saveToLocalStorage(restored);
+          return restored;
+        });
+      }
+      alert(
+        language === 'ko'
+          ? '⚠️ 서버 삭제 실패: 로컬에서만 삭제되었습니다.'
+          : '⚠️ Server deletion failed: Deleted locally only.'
+      );
     }
   }, [testIdeas, language, saveToLocalStorage]);
 

@@ -35,6 +35,14 @@ export default function ICECalculator({ onAddTestIdea, language }: ICECalculator
       expectedImprovement,
       monthlyTraffic
     });
+    
+    // 사용자 피드백 개선
+    alert(
+      language === 'ko'
+        ? `✅ "${name}" 아이디어가 추가되었습니다!\n\n💡 팁: "테스트 아이디어 관리" 탭에서 전체 목록을 확인할 수 있습니다.`
+        : `✅ Test idea "${name}" has been added!\n\n💡 Tip: Check the "Test Ideas" tab to see the full list.`
+    );
+    
     // Reset form
     setName('');
     setImpact(5);

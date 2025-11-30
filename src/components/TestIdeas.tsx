@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TestIdea } from '../App';
-import { Search, Filter, Trash2, Edit, Play, CheckCircle, Clock, Lightbulb, TrendingUp, ArrowUpDown } from 'lucide-react';
+import { Search, Filter, Trash2, Edit, Play, CheckCircle, Clock, Lightbulb, TrendingUp, ArrowUpDown, CloudOff } from 'lucide-react';
 import { Language, translations } from '../types/translations';
 
 type TestIdeasProps = {
@@ -173,7 +173,15 @@ export default function TestIdeas({ testIdeas, onUpdate, onDelete, language }: T
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-gray-900 mb-2">{idea.name}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-gray-900">{idea.name}</h3>
+                        {idea.synced === false && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs">
+                            <CloudOff className="w-3 h-3" />
+                            {language === 'ko' ? '로컬만' : 'Local only'}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-3">
                         {getStatusBadge(idea.status)}
                         <span className="text-gray-500 text-sm">
