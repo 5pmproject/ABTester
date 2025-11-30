@@ -11,6 +11,16 @@ type DashboardProps = {
 export default function Dashboard({ testIdeas, language }: DashboardProps) {
   const t = translations[language];
   
+  // 언어별 통화 포맷 함수
+  const formatCurrency = (amount: number): string => {
+    const value = Math.round(amount);
+    if (language === 'ko') {
+      return `₩${value.toLocaleString('ko-KR')}`;
+    } else {
+      return `$${value.toLocaleString('en-US')}`;
+    }
+  };
+  
   // 🔍 디버깅: Dashboard가 받은 testIdeas 확인
   console.log('🎯 Dashboard - testIdeas 개수:', testIdeas.length);
   console.log('🎯 Dashboard - testIdeas 데이터:', testIdeas);
@@ -98,7 +108,7 @@ export default function Dashboard({ testIdeas, language }: DashboardProps) {
               <AlertCircle className="w-5 h-5" style={{ color: '#a89075' }} />
               <span className="text-sm text-gray-700 font-medium">{t.dailyOpportunityCost}</span>
             </div>
-            <p className="text-gray-900 text-2xl font-semibold">${totalOpportunityCost.toFixed(0)}</p>
+            <p className="text-gray-900 text-2xl font-semibold">{formatCurrency(totalOpportunityCost)}</p>
           </div>
         </div>
       </div>
@@ -237,20 +247,20 @@ export default function Dashboard({ testIdeas, language }: DashboardProps) {
             <div className="flex-1">
               <h3 className="text-red-900 mb-2">⚠️ {t.highOpportunityCostWarning}</h3>
               <p className="text-red-700 mb-4">
-                {t.opportunityCostMessage} <strong>${totalOpportunityCost.toFixed(0)}</strong> {t.opportunityCostMessage2} <strong>${(totalOpportunityCost * 2.5).toFixed(0)}</strong> {t.opportunityCostMessage3}
+                {t.opportunityCostMessage} <strong>{formatCurrency(totalOpportunityCost)}</strong> {t.opportunityCostMessage2} <strong>{formatCurrency(totalOpportunityCost * 2.5)}</strong> {t.opportunityCostMessage3}
               </p>
               <div className="flex items-center gap-4">
                 <div className="flex-1 bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.dailyLoss}</p>
-                  <p className="text-red-900 text-2xl">${totalOpportunityCost.toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">{formatCurrency(totalOpportunityCost)}</p>
                 </div>
                 <div className="flex-1 bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.monthlyLoss}</p>
-                  <p className="text-red-900 text-2xl">${(totalOpportunityCost * 30).toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">{formatCurrency(totalOpportunityCost * 30)}</p>
                 </div>
                 <div className="flex-1 bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.psychologicalLoss}</p>
-                  <p className="text-red-900 text-2xl">${(totalOpportunityCost * 2.5).toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">{formatCurrency(totalOpportunityCost * 2.5)}</p>
                 </div>
               </div>
             </div>

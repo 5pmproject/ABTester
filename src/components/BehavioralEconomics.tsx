@@ -15,6 +15,16 @@ export default function BehavioralEconomics({ testIdeas, language, onNavigateToI
   const [avgOrderValue, setAvgOrderValue] = useState(50);
   const [delayDays, setDelayDays] = useState(7);
 
+  // 언어별 통화 포맷 함수
+  const formatCurrency = (amount: number): string => {
+    const value = Math.round(amount);
+    if (language === 'ko') {
+      return `₩${value.toLocaleString('ko-KR')}`;
+    } else {
+      return `$${value.toLocaleString('en-US')}`;
+    }
+  };
+
   // testIdeas가 업데이트되면 첫 번째 아이디어를 자동 선택
   useEffect(() => {
     if (!selectedTestId && testIdeas.length > 0) {
@@ -223,19 +233,19 @@ export default function BehavioralEconomics({ testIdeas, language, onNavigateToI
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.dailyLoss}</p>
-                  <p className="text-red-900 text-xl">${opportunityCost.daily.toFixed(0)}</p>
+                  <p className="text-red-900 text-xl">{formatCurrency(opportunityCost.daily)}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.weeklyLoss}</p>
-                  <p className="text-red-900 text-xl">${opportunityCost.weekly.toFixed(0)}</p>
+                  <p className="text-red-900 text-xl">{formatCurrency(opportunityCost.weekly)}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-red-200">
                   <p className="text-red-600 text-sm mb-1">{t.monthlyLoss}</p>
-                  <p className="text-red-900 text-xl">${opportunityCost.monthly.toFixed(0)}</p>
+                  <p className="text-red-900 text-xl">{formatCurrency(opportunityCost.monthly)}</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-red-300">
                   <p className="text-red-600 text-sm mb-1">{t.psychologicalLoss}</p>
-                  <p className="text-red-900 text-xl">${opportunityCost.psychological.toFixed(0)}</p>
+                  <p className="text-red-900 text-xl">{formatCurrency(opportunityCost.psychological)}</p>
                   <p className="text-red-500 text-xs mt-1">×2.5 {t.multiplier}</p>
                 </div>
               </div>
@@ -243,11 +253,11 @@ export default function BehavioralEconomics({ testIdeas, language, onNavigateToI
               <div className="bg-white rounded-lg p-4 border-2 border-red-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-red-700">{delayDays} {t.totalLossForDays}</p>
-                  <p className="text-red-900 text-2xl">${(opportunityCost?.totalLoss ?? 0).toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">{formatCurrency(opportunityCost?.totalLoss ?? 0)}</p>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-red-200">
                   <p className="text-red-700">{t.kahnemanLossAversion}</p>
-                  <p className="text-red-900 text-2xl">${(opportunityCost?.psychologicalTotalLoss ?? 0).toFixed(0)}</p>
+                  <p className="text-red-900 text-2xl">{formatCurrency(opportunityCost?.psychologicalTotalLoss ?? 0)}</p>
                 </div>
               </div>
 
