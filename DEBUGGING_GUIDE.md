@@ -335,3 +335,5 @@ Components → App → hooks → testIdeas
 - localStorage 직접 확인
 - Network 탭 (Supabase 호출 확인)
 
+
+

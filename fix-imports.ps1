@@ -32,3 +32,5 @@ Write-Host ""
 Write-Host "다음 명령어로 확인하세요:" -ForegroundColor Yellow
 Write-Host "  npm run type-check" -ForegroundColor Cyan
 
+
+
