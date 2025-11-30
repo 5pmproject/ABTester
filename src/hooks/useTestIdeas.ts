@@ -60,14 +60,36 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
    * Supabase에서 데이터 로드
    */
   const loadTestIdeas = useCallback(async () => {
+    // ✅ Supabase 미설정 시 localStorage만 사용
     if (!isSupabaseConfigured()) {
-      // Supabase 미설정 시 localStorage 사용
       const localData = loadFromLocalStorage();
       setTestIdeas(localData);
       setIsOnline(false);
+      console.log('✅ localStorage 모드: 로컬 데이터 로드');
       return;
     }
 
+    // ✅ 게스트 모드 체크
+    try {
+      const { data: { user } } = await testIdeasService.supabase.auth.getUser();
+      if (!user) {
+        // 게스트 모드: localStorage만 사용
+        const localData = loadFromLocalStorage();
+        setTestIdeas(localData);
+        setIsOnline(false);
+        console.log('✅ 게스트 모드: 로컬 데이터 로드');
+        return;
+      }
+    } catch (authErr) {
+      // 인증 확인 실패: localStorage 사용
+      const localData = loadFromLocalStorage();
+      setTestIdeas(localData);
+      setIsOnline(false);
+      console.log('✅ 인증 확인 실패: 로컬 데이터 로드');
+      return;
+    }
+
+    // ✅ 로그인 상태: Supabase 데이터 로드
     setLoading(true);
     setError(null);
 
@@ -77,6 +99,7 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
       setIsOnline(true);
       // Backup to localStorage
       saveToLocalStorage(data);
+      console.log('✅ Supabase 데이터 로드 성공:', data.length, '개');
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
@@ -84,14 +107,9 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
       
       // Fallback to localStorage
       const localData = loadFromLocalStorage();
-      if (localData.length > 0) {
-        setTestIdeas(localData);
-        setError(language === 'ko' 
-          ? '오프라인 데이터를 표시합니다' 
-          : 'Showing offline data'
-        );
-      }
+      setTestIdeas(localData);
       setIsOnline(false);
+      console.warn('⚠️ Supabase 로드 실패: 로컬 데이터 표시');
     } finally {
       setLoading(false);
     }
@@ -203,16 +221,31 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
     setTestIdeas(updatedIdeas);
     saveToLocalStorage(updatedIdeas);
 
+    // ✅ Supabase 미설정 시 localStorage만 사용
     if (!isSupabaseConfigured()) {
-      return; // localStorage만 사용
+      return;
     }
 
+    // ✅ 게스트 모드 체크
+    try {
+      const { data: { user } } = await testIdeasService.supabase.auth.getUser();
+      if (!user) {
+        console.log('✅ 게스트 모드: 로컬만 업데이트');
+        return;
+      }
+    } catch (authErr) {
+      console.log('✅ 인증 확인 실패: 로컬만 업데이트');
+      return;
+    }
+
+    // ✅ 로그인 상태: Supabase 업데이트
     try {
       await testIdeasService.update(id, updates);
       // 성공 시 synced: true 표시
       setTestIdeas(prev => 
         prev.map(t => t.id === id ? { ...t, synced: true } : t)
       );
+      console.log('✅ Supabase 업데이트 성공');
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
@@ -223,6 +256,7 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
         saveToLocalStorage(updated);
         return updated;
       });
+      console.warn('⚠️ Supabase 업데이트 실패: 로컬만 저장');
     }
   }, [testIdeas, language, saveToLocalStorage]);
 
@@ -238,12 +272,27 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
     setTestIdeas(updatedIdeas);
     saveToLocalStorage(updatedIdeas);
 
+    // ✅ Supabase 미설정 시 localStorage만 사용
     if (!isSupabaseConfigured()) {
-      return; // localStorage만 사용
+      return;
     }
 
+    // ✅ 게스트 모드 체크
+    try {
+      const { data: { user } } = await testIdeasService.supabase.auth.getUser();
+      if (!user) {
+        console.log('✅ 게스트 모드: 로컬만 삭제');
+        return;
+      }
+    } catch (authErr) {
+      console.log('✅ 인증 확인 실패: 로컬만 삭제');
+      return;
+    }
+
+    // ✅ 로그인 상태: Supabase 삭제
     try {
       await testIdeasService.delete(id);
+      console.log('✅ Supabase 삭제 성공');
     } catch (err: any) {
       const apiError = handleSupabaseError(err, language);
       setError(apiError.message);
@@ -256,6 +305,7 @@ export function useTestIdeas(options: UseTestIdeasOptions = {}): UseTestIdeasRet
           return restored;
         });
       }
+      console.warn('⚠️ Supabase 삭제 실패: 로컬에서 복원');
       alert(
         language === 'ko'
           ? '⚠️ 서버 삭제 실패: 로컬에서만 삭제되었습니다.'
